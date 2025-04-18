@@ -1,0 +1,74 @@
+server:
+  port: ${APP_PORT:8081}
+  servlet:
+    context-path: /
+
+springdoc:
+  packages-to-scan: com.security.demo
+logging:
+  level:
+    com:
+      elyadata: INFO
+
+# For Spring Actuator
+info:
+  artifact: ${project.artifactId}
+  name: ${project.name}
+  description: ${project.description}
+  version: ${project.version}
+  version-contract: V1
+  version-contract-api: 1.0.0
+
+management:
+  health:
+    status:
+      http-mapping:
+        DOWN: 200
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: "always"
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: health,info,prometheus,env
+      base-path: /
+      path-mapping:
+        prometheus: prometheus
+  info:
+    git:
+      mode: full
+otel:
+  propagators:
+    - tracecontext
+  resource:
+    attributes:
+      deployment.environment: dev
+      service:
+        name: candidate
+        namespace: etap-dev
+  traces:
+    exporter: console
+  logs:
+    exporter: console
+
+spring:
+  profiles:
+    include: default
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:security}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
